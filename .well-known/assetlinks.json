@@ -1,0 +1,1 @@
+[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "android_app", "package_name": "app.mywonders", "sha256_cert_fingerprints": ["CF:BB:C0:57:2D:8E:08:17:3E:37:37:C0:5D:B4:98:F4:62:95:82:5E:3E:4B:10:20:4B:26:13:9B:8F:53:A6:70"]}}]
