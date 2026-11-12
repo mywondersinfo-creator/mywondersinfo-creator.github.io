@@ -1,0 +1,59 @@
+{
+  "id": "./",
+  "name": "Minhas maravilhas",
+  "short_name": "Maravilhas",
+  "description": "Anote o que houve de bom no dia: cada maravilha acende uma estrela no seu céu",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "pt",
+  "background_color": "#010208",
+  "theme_color": "#010208",
+  "categories": [
+    "lifestyle",
+    "health"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "share_target": {
+    "action": "./share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "files": [
+        {
+          "name": "photo",
+          "accept": [
+            "image/*"
+          ]
+        }
+      ]
+    }
+  },
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
+  "dir": "ltr"
+}
