@@ -1,6 +1,6 @@
 // Мои чудеса (My Wonders) — офлайн-кэш и приём фото из «Поделиться». При обновлении приложения увеличь номер версии.
-const CACHE = "mc2-v237", SHARE = "mc2-share", REM = "mc2-rem";
-const FILES = ["./", "index.html", "manifest.webmanifest", "manifest-ru.webmanifest", "manifest-en.webmanifest", "manifest-fr.webmanifest", "manifest-es.webmanifest", "manifest-de.webmanifest", "manifest-it.webmanifest", "manifest-pt.webmanifest", "manifest-tr.webmanifest", "manifest-zh.webmanifest", "manifest-ja.webmanifest", "manifest-hi.webmanifest", "manifest-el.webmanifest", "manifest-ar.webmanifest", "manifest-fa.webmanifest", "manifest-he.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "privacy.html", "zvuk-zvezda.mp3"];
+const CACHE = "mc2-v251", SHARE = "mc2-share", REM = "mc2-rem";
+const FILES = ["./", "index.html", "manifest.webmanifest", "manifest-ru.webmanifest", "manifest-en.webmanifest", "manifest-fr.webmanifest", "manifest-es.webmanifest", "manifest-de.webmanifest", "manifest-it.webmanifest", "manifest-pt.webmanifest", "manifest-tr.webmanifest", "manifest-zh.webmanifest", "manifest-ja.webmanifest", "manifest-hi.webmanifest", "manifest-el.webmanifest", "manifest-ar.webmanifest", "manifest-fa.webmanifest", "manifest-he.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "privacy.html", "zvuk-zvezda.mp3", "intro.mp4", "snd-med.mp3", "snd-space.mp3", "snd-alb.mp3"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: "reload" })))).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE && k !== SHARE && k !== REM).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", (e) => {
@@ -20,6 +20,21 @@ self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   // cache-first: the app (8 MB) is downloaded once per version, not on every launch; a new version arrives with a new sw.js
   if (url.origin !== location.origin) return;
+  // the film and the music are separate files: players ask for them in pieces, so a piece is cut from the cached file
+  const range = e.request.headers.get("range");
+  if (range) {
+    e.respondWith((async () => {
+      const hit = await caches.match(e.request, { ignoreSearch: true });
+      if (!hit) return fetch(e.request);
+      const buf = await hit.arrayBuffer(), m = /bytes=(\d*)-(\d*)/.exec(range) || [];
+      let a = m[1] ? +m[1] : 0, b = m[2] ? +m[2] : buf.byteLength - 1;
+      if (!m[1] && m[2]) { a = Math.max(0, buf.byteLength - +m[2]); b = buf.byteLength - 1; }
+      b = Math.min(b, buf.byteLength - 1);
+      if (a > b || a >= buf.byteLength) return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + buf.byteLength } });
+      return new Response(buf.slice(a, b + 1), { status: 206, headers: { "Content-Type": hit.headers.get("Content-Type") || "application/octet-stream", "Content-Range": "bytes " + a + "-" + b + "/" + buf.byteLength, "Content-Length": String(b - a + 1), "Accept-Ranges": "bytes" } });
+    })());
+    return;
+  }
   e.respondWith(caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || fetch(e.request).then((r) => {
     if (r && r.ok) { const cp = r.clone(); caches.open(CACHE).then((c) => c.put(e.request, cp)); }
     return r;
