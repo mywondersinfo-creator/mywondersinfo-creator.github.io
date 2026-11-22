@@ -1,5 +1,5 @@
 // Мои чудеса (My Wonders) — офлайн-кэш и приём фото из «Поделиться». При обновлении приложения увеличь номер версии.
-const CACHE = "mc2-v254", SHARE = "mc2-share", REM = "mc2-rem";
+const CACHE = "mc2-v257", SHARE = "mc2-share", REM = "mc2-rem";
 const FILES = ["./", "index.html", "manifest.webmanifest", "manifest-ru.webmanifest", "manifest-en.webmanifest", "manifest-fr.webmanifest", "manifest-es.webmanifest", "manifest-de.webmanifest", "manifest-it.webmanifest", "manifest-pt.webmanifest", "manifest-tr.webmanifest", "manifest-zh.webmanifest", "manifest-ja.webmanifest", "manifest-hi.webmanifest", "manifest-el.webmanifest", "manifest-ar.webmanifest", "manifest-fa.webmanifest", "manifest-he.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "privacy.html", "zvuk-zvezda.mp3", "intro.mp4", "snd-med.mp3", "snd-space.mp3", "snd-alb.mp3"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: "reload" })))).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE && k !== SHARE && k !== REM).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
